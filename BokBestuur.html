@@ -1,0 +1,630 @@
+
+<!DOCTYPE html>
+<html lang="af">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BokBestuur - Boerbok Bestuur</title>
+
+<style>
+:root {
+    --groen: #245c38;
+    --liggroen: #e8f1e7;
+    --goud: #d9a441;
+    --wit: #ffffff;
+    --agtergrond: #f3f5ef;
+    --teks: #26332a;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: var(--agtergrond);
+    color: var(--teks);
+}
+
+header {
+    background: var(--groen);
+    color: white;
+    padding: 24px 16px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 30px;
+}
+
+header p {
+    margin-bottom: 0;
+}
+
+main {
+    width: 95%;
+    max-width: 1100px;
+    margin: 22px auto;
+}
+
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 12px #0000000d;
+}
+
+h2 {
+    color: var(--groen);
+    margin-top: 0;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.stat {
+    background: var(--liggroen);
+    border-left: 4px solid var(--groen);
+    border-radius: 8px;
+    padding: 16px 12px;
+}
+
+.stat p {
+    margin: 0 0 8px;
+    font-size: 13px;
+}
+
+.stat strong {
+    font-size: 22px;
+    overflow-wrap: anywhere;
+}
+
+label {
+    display: block;
+    margin: 12px 0 6px;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd3c8;
+    border-radius: 7px;
+    font-size: 16px;
+}
+
+button {
+    border: none;
+    border-radius: 7px;
+    padding: 12px 16px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 12px;
+}
+
+.primary {
+    background: var(--groen);
+    color: white;
+}
+
+.secondary {
+    background: var(--goud);
+    color: #222;
+}
+
+.danger {
+    background: #a83232;
+    color: white;
+    padding: 8px 10px;
+    margin: 0;
+}
+
+button:hover {
+    opacity: 0.86;
+}
+
+.message {
+    margin-top: 12px;
+    font-weight: bold;
+}
+
+.table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 480px;
+}
+
+th, td {
+    text-align: left;
+    padding: 12px 10px;
+    border-bottom: 1px solid #e4e8e2;
+}
+
+th {
+    background: var(--liggroen);
+}
+
+.empty {
+    text-align: center;
+    padding: 25px;
+    color: #687268;
+}
+
+.price-note {
+    background: #fff6df;
+    padding: 12px;
+    border-radius: 7px;
+    line-height: 1.5;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    color: #596459;
+}
+
+@media (max-width: 650px) {
+    .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    header h1 {
+        font-size: 25px;
+    }
+
+    .card {
+        padding: 15px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🐐 BokBestuur</h1>
+    <p>Jou Boerbokke. Jou gewigte. Jou wins.</p>
+</header>
+
+<main>
+
+    <section class="stats">
+        <div class="stat">
+            <p>Getal bokke</p>
+            <strong id="aantal">0</strong>
+        </div>
+
+        <div class="stat">
+            <p>Totale gewig</p>
+            <strong id="totaalGewig">0 kg</strong>
+        </div>
+
+        <div class="stat">
+            <p>Gemiddelde gewig</p>
+            <strong id="gemiddeld">0 kg</strong>
+        </div>
+
+        <div class="stat">
+            <p>Totale verkoopwaarde</p>
+            <strong id="inkomste">R0,00</strong>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>1. Voeg 'n bok by</h2>
+
+        <form id="bokVorm">
+            <label for="bokNommer">Bok se nommer / ID</label>
+            <input
+                type="text"
+                id="bokNommer"
+                placeholder="Byvoorbeeld: BK001"
+                required
+            >
+
+            <label for="bokGewig">Gewig in kilogram (kg)</label>
+            <input
+                type="number"
+                id="bokGewig"
+                placeholder="Byvoorbeeld: 35.5"
+                min="0.01"
+                max="1000"
+                step="0.01"
+                required
+            >
+
+            <button type="submit" class="primary">
+                + Voeg bok by
+            </button>
+        </form>
+
+        <div id="boodskap" class="message" aria-live="polite"></div>
+    </section>
+
+    <section class="card">
+        <h2>2. Verkoopprys</h2>
+
+        <label for="prys">Prys per kilogram (R)</label>
+        <input
+            type="number"
+            id="prys"
+            value="80"
+            min="0"
+            max="1000000"
+            step="0.01"
+        >
+
+        <p class="price-note">
+            Verander die prys soos jy wil. Die app bereken outomaties
+            die nuwe totale verkoopwaarde vir al jou bokke.
+        </p>
+    </section>
+
+    <section class="card">
+        <h2>3. Jou bokke se gewigte</h2>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nommer</th>
+                        <th>Gewig (kg)</th>
+                        <th>Waarde</th>
+                        <th>Verwyder</th>
+                    </tr>
+                </thead>
+
+                <tbody id="bokLys">
+                    <tr>
+                        <td colspan="4" class="empty">
+                            Geen bokke geregistreer nie.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <button class="secondary" onclick="laaiCSV()">
+            Laai lys af (CSV)
+        </button>
+
+        <button class="primary" onclick="drukLys()">
+            Druk verslag
+        </button>
+    </section>
+
+    <section class="card">
+        <h2>4. Verkoopopsomming</h2>
+
+        <p>Totale aantal bokke: <strong id="opsomAantal">0</strong></p>
+
+        <p>Totale kilogram: <strong id="opsomGewig">0 kg</strong></p>
+
+        <p>Gemiddelde gewig per bok:
+            <strong id="opsomGemiddeld">0 kg</strong>
+        </p>
+
+        <p>Prys per kilogram: <strong id="opsomPrys">R80,00</strong></p>
+
+        <h2>Geskatte totale inkomste:
+            <span id="opsomInkomste">R0,00</span>
+        </h2>
+
+        <p class="price-note">
+            Hierdie bedrag is die bruto verkoopwaarde, nie wins nie.
+            Vervoer, voer, veeartsenykoste en ander uitgawes word
+            nie afgetrek nie.
+        </p>
+    </section>
+
+</main>
+
+<footer>
+    BokBestuur &copy; 2026 | Boerbok-bestuur maklik gemaak.
+</footer>
+
+<script>
+const vorm = document.getElementById("bokVorm");
+const nommerVeld = document.getElementById("bokNommer");
+const gewigVeld = document.getElementById("bokGewig");
+const prysVeld = document.getElementById("prys");
+const boodskap = document.getElementById("boodskap");
+const bokLys = document.getElementById("bokLys");
+
+let bokke = [];
+
+try {
+    const gestoor = localStorage.getItem("bokBestuurData");
+
+    if (gestoor) {
+        const data = JSON.parse(gestoor);
+
+        if (Array.isArray(data)) {
+            bokke = data.filter(b =>
+                b &&
+                typeof b.id === "string" &&
+                b.id.trim() !== "" &&
+                typeof b.gewig === "number" &&
+                Number.isFinite(b.gewig) &&
+                b.gewig > 0
+            );
+        }
+    }
+} catch (fout) {
+    bokke = [];
+}
+
+function geld(bedrag) {
+    return bedrag.toLocaleString("af-ZA", {
+        style: "currency",
+        currency: "ZAR"
+    });
+}
+
+function getal(nommer) {
+    return nommer.toLocaleString("af-ZA", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+    });
+}
+
+function stoorData() {
+    try {
+        localStorage.setItem(
+            "bokBestuurData",
+            JSON.stringify(bokke)
+        );
+        return true;
+    } catch (fout) {
+        boodskap.textContent =
+            "Waarskuwing: Data kon nie gestoor word nie. Laai jou CSV-lys af.";
+        return false;
+    }
+}
+
+function kryPrys() {
+    const prys = Number(prysVeld.value);
+
+    if (
+        prysVeld.value.trim() === "" ||
+        !Number.isFinite(prys) ||
+        prys < 0 ||
+        prys > 1000000
+    ) {
+        return null;
+    }
+
+    return prys;
+}
+
+vorm.addEventListener("submit", function(gebeurtenis) {
+    gebeurtenis.preventDefault();
+
+    const id = nommerVeld.value.trim();
+    const gewig = Number(gewigVeld.value);
+
+    if (!id) {
+        wysBoodskap("Voer asseblief 'n boknommer in.");
+        return;
+    }
+
+    if (
+        !Number.isFinite(gewig) ||
+        gewig <= 0 ||
+        gewig > 1000
+    ) {
+        wysBoodskap("Voer 'n geldige gewig in kilogram in.");
+        return;
+    }
+
+    const bestaan = bokke.some(
+        bok => bok.id.toLowerCase() === id.toLowerCase()
+    );
+
+    if (bestaan) {
+        wysBoodskap("Hierdie boknommer bestaan reeds.");
+        return;
+    }
+
+    bokke.push({
+        id: id,
+        gewig: gewig
+    });
+
+    stoorData();
+    vorm.reset();
+
+    wysBoodskap("Bok suksesvol geregistreer!");
+    wysAlles();
+    nommerVeld.focus();
+});
+
+function wysBoodskap(teks) {
+    boodskap.textContent = teks;
+}
+
+prysVeld.addEventListener("input", wysAlles);
+
+function verwyderBok(indeks) {
+    if (indeks < 0 || indeks >= bokke.length) {
+        return;
+    }
+
+    const bevestig = confirm(
+        "Wil jy hierdie bok se inskrywing verwyder?"
+    );
+
+    if (!bevestig) {
+        return;
+    }
+
+    bokke.splice(indeks, 1);
+    stoorData();
+    wysBoodskap("Bok verwyder.");
+    wysAlles();
+}
+
+function wysAlles() {
+    const aantal = bokke.length;
+
+    const totaal = bokke.reduce(
+        (som, bok) => som + bok.gewig,
+        0
+    );
+
+    const gemiddelde = aantal > 0 ? totaal / aantal : 0;
+    const prys = kryPrys();
+    const inkomste = prys === null ? 0 : totaal * prys;
+
+    document.getElementById("aantal").textContent = aantal;
+    document.getElementById("totaalGewig").textContent =
+        getal(totaal) + " kg";
+
+    document.getElementById("gemiddeld").textContent =
+        getal(gemiddelde) + " kg";
+
+    document.getElementById("inkomste").textContent =
+        prys === null ? "Kontroleer prys" : geld(inkomste);
+
+    document.getElementById("opsomAantal").textContent = aantal;
+    document.getElementById("opsomGewig").textContent =
+        getal(totaal) + " kg";
+
+    document.getElementById("opsomGemiddeld").textContent =
+        getal(gemiddelde) + " kg";
+
+    document.getElementById("opsomPrys").textContent =
+        prys === null ? "Ongeldig" : geld(prys);
+
+    document.getElementById("opsomInkomste").textContent =
+        prys === null ? "Kontroleer prys" : geld(inkomste);
+
+    bokLys.replaceChildren();
+
+    if (aantal === 0) {
+        const ry = document.createElement("tr");
+        const sel = document.createElement("td");
+
+        sel.colSpan = 4;
+        sel.className = "empty";
+        sel.textContent = "Geen bokke geregistreer nie.";
+
+        ry.appendChild(sel);
+        bokLys.appendChild(ry);
+        return;
+    }
+
+    bokke.forEach(function(bok, indeks) {
+        const ry = document.createElement("tr");
+
+        const nommerSel = document.createElement("td");
+        nommerSel.textContent = bok.id;
+
+        const gewigSel = document.createElement("td");
+        gewigSel.textContent = getal(bok.gewig) + " kg";
+
+        const waardeSel = document.createElement("td");
+        waardeSel.textContent =
+            prys === null ? "—" : geld(bok.gewig * prys);
+
+        const aksieSel = document.createElement("td");
+        const knoppie = document.createElement("button");
+
+        knoppie.textContent = "Verwyder";
+        knoppie.className = "danger";
+        knoppie.type = "button";
+
+        knoppie.addEventListener("click", function() {
+            verwyderBok(indeks);
+        });
+
+        aksieSel.appendChild(knoppie);
+
+        ry.append(
+            nommerSel,
+            gewigSel,
+            waardeSel,
+            aksieSel
+        );
+
+        bokLys.appendChild(ry);
+    });
+}
+
+function laaiCSV() {
+    const prys = kryPrys();
+
+    if (prys === null) {
+        alert("Voer asseblief 'n geldige prys per kilogram in.");
+        return;
+    }
+
+    const rye = [
+        ["Boknommer", "Gewig (kg)", "Prys per kg (R)", "Waarde (R)"]
+    ];
+
+    bokke.forEach(function(bok) {
+        rye.push([
+            bok.id,
+            bok.gewig.toFixed(2),
+            prys.toFixed(2),
+            (bok.gewig * prys).toFixed(2)
+        ]);
+    });
+
+    const totaal = bokke.reduce(
+        (som, bok) => som + bok.gewig,
+        0
+    );
+
+    rye.push([]);
+    rye.push(["Aantal bokke", bokke.length]);
+    rye.push(["Totale gewig (kg)", totaal.toFixed(2)]);
+    rye.push([
+        "Gemiddelde gewig (kg)",
+        bokke.length ? (totaal / bokke.length).toFixed(2) : "0.00"
+    ]);
+    rye.push(["Totale verkoopwaarde (R)", (totaal * prys).toFixed(2)]);
+
+    const csv = "\uFEFF" + rye.map(ry =>
+        ry.map(waarde =>
+            '"' + String(waarde).replace(/"/g, '""') + '"'
+        ).join(";")
+    ).join("\r\n");
+
+    const blob = new Blob([csv], {
+        type: "text/csv;charset=utf-8;"
+    });
+
+    const url = URL.createObjectURL(blob);
+    const skakel = document.createElement("a");
+
+    skakel.href = url;
+    skakel.download = "BokBestuur-Verslag.csv";
+    skakel.click();
+
+    URL.revokeObjectURL(url);
+}
+
+function drukLys() {
+    window.print();
+}
+
+wysAlles();
+</script>
+
+</body>
+</html>
